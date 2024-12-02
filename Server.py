@@ -161,7 +161,29 @@ class Server:
             if userName in self.__channels[channelName]:
                 self.deleteUserFromChannel(Admin(None), userName, channelName) 
 
- 
+    # Method to delete a message from a channel
+    def deleteMessageFromServer(self, member, message, channelName):
+        # Check if member has the required permission
+        if not member.hasPermission(Permission.REMOVE_MESSAGE):
+            print(f"Error: {member.name} does not have permission to delete a message.")
+            return False
+
+        # Check if the channel exists
+        if channelName not in self.__channels:
+            print(f"Error: Channel '{channelName}' does not exist.")
+            return False
+        
+        # Look for message using substring
+        for i in range(self.__chatLogs[channelName]):
+            if message in self.__chatLogs[channelName][i]:
+                del self.__chatLogs[channelName][i]
+                print("\nMessage successfully deleted!")
+                return True
+        
+        # Returns False if message is not found
+        print("\nMessage not found")
+        return False
+
 
 
     # Method to display all members in the server
