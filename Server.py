@@ -141,7 +141,3 @@ class Server:
             print(x)
         return True
 
-    # Method to check if the server has no channels
-    def isEmpty(self) -> bool:
-        # Return True if no channels exist, otherwise False
-        return not bool(self.__channels)
