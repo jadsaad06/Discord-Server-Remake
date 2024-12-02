@@ -3,6 +3,7 @@ from enum import Enum
 # Enum for defining permissions
 class Permission(Enum):
     POST_MESSAGE = "post_message"
+    REMOVE_MESSAGE = "remove_message"
     VIEW_FEED = "view_feed"
     CREATE_CHANNEL = "create_channel"
     DELETE_CHANNEL = "delete_channel"
@@ -46,5 +47,6 @@ class User(Member):
 class Bot(Member):
     def __init__(self, name: str):
         super().__init__(name)
-        self.__permissions = [Permission.SCAN_CONTENT]
+        self.__permissions = [Permission.REMOVE_MESSAGE,
+                              Permission.VIEW_FEED]
 
