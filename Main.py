@@ -33,8 +33,10 @@ def main():
     else:
         member = Admin(name)
     
+    server.addUserToServer(member)
+    
     choice = 0
-    currChannel = None
+    channelName = None
 
     while choice != 5:
         displayMenu()
@@ -154,10 +156,6 @@ def launchAdminMenu(member: Member, server: Server, channelName: str) -> None:
             server.deleteMessageFromServer(member, message, channelName)
         else:
             print("\nNot in a channel!")  # Handle case when not in a channel
-
-
-            
-
 
     
 def joinChannel(server: Server, member: Member) -> str:

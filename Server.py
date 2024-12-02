@@ -11,7 +11,7 @@ class Server:
         self.__channels = {}
         
         # Array to store all members in the server, initially empty
-        self.__members = np.empty(10, dtype=str)
+        self.__members = np.empty(15, dtype=str)
 
     # Method to create a new channel
     def createChannel(self, member, channelName) -> bool:
@@ -45,7 +45,7 @@ class Server:
     # Method to add a new user to the server
     def addUserToServer(self, user) -> bool:
         # Check if the server's member array is full
-        if self.__members.size >= 10 and all(self.__members):
+        if self.__members.size >= 15 and all(self.__members):
             print("Error: Server member limit reached.")
             return False
         
