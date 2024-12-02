@@ -54,7 +54,7 @@ def main():
 
             elif choice == 4:
                 if member.hasPermission("create_channel"):
-                    launchAdminMenu()
+                    launchAdminMenu(member, server, channelName)
                 else:
                     print("Only Admins can perform this action.")
             elif choice == 5:
@@ -78,53 +78,82 @@ def displayChannelMenu() -> None:
 3. Go Back""")
 
 def launchAdminMenu(member: Member, server: Server, channelName: str) -> None:
+    # Display the admin menu with options
     print("""Admin Console: 
 1. Add User 
 2. Remove User 
 3. Delete Message.
 4. Go Back""")
     
+    valid = False  # Flag to track valid input
+
+    # Loop until the user provides a valid input for the main menu
     while not valid:
-        try: 
+        try:
+            # Prompt user for input and convert to an integer
             choice = int(input("\nEnter your choice: "))
 
-            if choice in [1,2,3]:
+            # Check if the choice is valid (1, 2, or 3 for actions)
+            if choice in [1, 2, 3]:
                 valid = True
 
         except ValueError:
+            # Handle case where input is not an integer
             print("\nInvalid Choice!")
 
+    # Action corresponding to the user's menu choice
     if choice == 1:
+        # Prompt to input the username of the user to add
         userName = input("\nInput name of user: ")
-
+        
+        # Add the user to the channel
         server.addUserToChannel(member, User(userName), channelName)
+
     elif choice == 2:
-        print("\nWould you like to remove from (1)Channel or (2)Server")
+        # Ask whether the user wants to remove from a channel or the server
+        print("\nWould you like to remove from (1) Channel or (2) Server")
+        
+        valid = False  # Reset valid flag for sub-menu input
         while not valid:
-            try: 
+            try:
+                # Get user's choice for removal type (channel or server)
                 remChoice = int(input("\nEnter your choice: "))
 
-                if remChoice in [1,2]:
+                # Check if the choice is valid (1 for channel, 2 for server)
+                if remChoice in [1, 2]:
                     valid = True
 
             except ValueError:
+                # Handle case where input is not an integer
                 print("\nInvalid Choice!")
         
-        userName = input("\nInput name of user: ")        
+        # Get the username of the user to remove
+        userName = input("\nInput name of user: ")
+
         if remChoice == 1:
+            # If removing from a channel, check if channelName is provided
             if channelName is not None:
+                # Remove user from the specified channel
                 server.deleteUserFromChannel(member, userName, channelName)
             else:
-                print("\nNot in a channel!")
+                print("\nNot in a channel!")  # Handle case when not in a channel
         else:
+            # If removing from the server, remove user from the server
             server.deleteUserFromServer(member, userName)
+
     elif choice == 3:
+        # If deleting a message from the server
         if channelName is not None:
+            # Display the chat log for the given channel
             server.displayChatLog(channelName)
 
-            message = input("Enter brief content of message you'd like to remove: ")
+            # Ask for the message content to delete
+            message = input("Enter the brief content of message you'd like to remove: ")
 
-            
+            # Delete the message from the server
+            server.deleteMessageFromServer(member, message, channelName)
+        else:
+            print("\nNot in a channel!")  # Handle case when not in a channel
 
 
             
