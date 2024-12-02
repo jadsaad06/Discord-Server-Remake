@@ -1,7 +1,20 @@
+# Check if save files exist
+import os
+
 from Server import Server
 from Member import Member, User, Admin
 
 def main():
+    
+    # Only load from files if the save files are present
+    files_exist = (
+        os.path.exists('members.txt') and 
+        os.path.exists('channels.txt') and 
+        os.path.exists('chatLogs.txt')
+    )
+    
+    # Create server, loading previous state if files exist
+    server = Server(load_from_files=files_exist)
     print("\nHello! Welcome to the Viking Gaming Hub!")
     print("\nWould you like to be a (1)User or (2)Admin? Enter 3 to exit.")
     
@@ -34,7 +47,7 @@ def main():
         member = Admin(name)
     
     server.addUserToServer(member)
-    
+
     choice = 0
     channelName = None
 

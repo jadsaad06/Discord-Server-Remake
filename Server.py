@@ -1,17 +1,135 @@
 from Member import Admin, User, Bot, Permission
 import numpy as np
+import os
 
 # ServerSystem class for managing channels and members
 class Server:
-    def __init__(self):
+    def __init__(self, load_from_files=False):
         # Dictionary to store chat logs for each channel
         self.__chatLogs = {}
         
         # Dictionary to store channels and their members
         self.__channels = {}
         
-        # Array to store all members in the server, initially empty
-        self.__members = np.empty(15, dtype=str)
+        # Array to store all members in the server
+        self.__members = np.empty(15, dtype=object)
+
+        # If load_from_files is True, load existing data
+        if load_from_files:
+            self.load_server_state()
+
+    def save_server_state(self):
+        """
+        Save server state to text files:
+        - members.txt: List of member names
+        - channels.txt: List of channel names
+        - chatLogs.txt: Chat logs for each channel
+        """
+        try:
+            # Save Members
+            with open('members.txt', 'w') as f:
+                for member in self.__members:
+                    if member is not None and member != '':
+                        f.write(f"{member.name}\n")
+
+            # Save Channels
+            with open('channels.txt', 'w') as f:
+                for channel in self.__channels.keys():
+                    f.write(f"{channel}\n")
+
+            # Save Chat Logs
+            with open('chatLogs.txt', 'w') as f:
+                for channel, logs in self.__chatLogs.items():
+                    f.write(f"Channel: {channel}\n")
+                    for log in logs:
+                        f.write(f"{log}\n")
+                    f.write("---END_OF_CHANNEL---\n")
+
+            print("Server state saved successfully.")
+            return True
+        except Exception as e:
+            print(f"Error saving server state: {e}")
+            return False
+
+    def load_server_state(self):
+        """
+        Load server state from text files:
+        - members.txt
+        - channels.txt
+        - chatLogs.txt
+        """
+        try:
+            # Load Members
+            if os.path.exists('members.txt'):
+                with open('members.txt', 'r') as f:
+                    members = [line.strip() for line in f.readlines()]
+                    # Here you'd typically recreate User objects based on names
+                    # For this example, we'll just store names
+                    for i, member_name in enumerate(members):
+                        if i < 15:  # Respect array size limit
+                            self.__members[i] = member_name
+
+            # Load Channels
+            if os.path.exists('channels.txt'):
+                with open('channels.txt', 'r') as f:
+                    channels = [line.strip() for line in f.readlines()]
+                    for channel in channels:
+                        self.__channels[channel] = []
+
+            # Load Chat Logs
+            if os.path.exists('chatLogs.txt'):
+                with open('chatLogs.txt', 'r') as f:
+                    current_channel = None
+                    for line in f:
+                        line = line.strip()
+                        if line.startswith('Channel:'):
+                            current_channel = line.split(': ')[1]
+                            self.__chatLogs[current_channel] = []
+                        elif line == '---END_OF_CHANNEL---':
+                            current_channel = None
+                        elif current_channel and line:
+                            self.__chatLogs[current_channel].append(line)
+
+            print("Server state loaded successfully.")
+            return True
+        except Exception as e:
+            print(f"Error loading server state: {e}")
+            return False
+
+    def createChannel(self, member, channelName) -> bool:
+        # Check if the member has the required permission
+        if not member.hasPermission(Permission.CREATE_CHANNEL):
+            print(f"Error: {member.name} does not have permission to create a channel.")
+            return False
+        
+        # Check if the channel already exists
+        if channelName in self.__channels:
+            print(f"Error: Channel '{channelName}' already exists.")
+            return False
+        
+        # Create the channel and initialize its member list
+        self.__channels[channelName] = []
+        print(f"Channel '{channelName}' created successfully by {member.name}.")
+        
+        # Save state after modification
+        self.save_server_state()
+        return True
+
+    # Similar modifications for other methods that change server state
+    def addUserToServer(self, user) -> bool:
+        # Existing implementation
+        result = self._add_user_logic(user)
+        if result:
+            self.save_server_state()
+        return result
+
+    def postMessage(self, member, channelName, message) -> bool:
+        # Existing implementation from original code
+        # Check permissions, channel existence, etc.
+        result = self.postMessage(member, channelName, message)
+        if result:
+            self.save_server_state()
+        return result
 
     # Method to create a new channel
     def createChannel(self, member, channelName) -> bool:
