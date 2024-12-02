@@ -7,14 +7,14 @@ from Member import Member, User, Admin
 def main():
     
     # Only load from files if the save files are present
-    files_exist = (
+    filesExist = (
         os.path.exists('members.txt') and 
         os.path.exists('channels.txt') and 
         os.path.exists('chatLogs.txt')
     )
     
     # Create server, loading previous state if files exist
-    server = Server(load_from_files=files_exist)
+    server = Server(filesExist)
     print("\nHello! Welcome to the Viking Gaming Hub!")
     print("\nWould you like to be a (1)User or (2)Admin? Enter 3 to exit.")
     
@@ -92,7 +92,7 @@ def displayChannelMenu() -> None:
 2. List All Users in Current Channel
 3. Go Back""")
 
-def launchAdminMenu(member: Member, server: Server, channelName: str) -> None:
+def launchAdminMenu(member, server: Server, channelName: str) -> None:
     # Display the admin menu with options
     print("""Admin Console: 
 1. Add User 
@@ -171,7 +171,7 @@ def launchAdminMenu(member: Member, server: Server, channelName: str) -> None:
             print("\nNot in a channel!")  # Handle case when not in a channel
 
     
-def joinChannel(server: Server, member: Member) -> str:
+def joinChannel(server: Server, member) -> str:
     success = False
 
     #checks if there are channels to display

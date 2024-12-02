@@ -19,7 +19,9 @@ class Member:
 
     def hasPermission(self, permission):
         return permission in self.__permissions
-
+    
+    def __str__(self):
+        return self._name
 # Derived class: Admin
 class Admin(Member):
     def __init__(self, name: str):
@@ -48,5 +50,6 @@ class Bot(Member):
     def __init__(self, name: str):
         super().__init__(name)
         self.__permissions = [Permission.REMOVE_MESSAGE,
-                              Permission.VIEW_FEED]
+                              Permission.VIEW_FEED,
+                              ]
 

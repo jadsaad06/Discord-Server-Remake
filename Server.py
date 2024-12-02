@@ -4,7 +4,7 @@ import os
 
 # ServerSystem class for managing channels and members
 class Server:
-    def __init__(self, load_from_files=False):
+    def __init__(self, loadFromFiles=False):
         # Dictionary to store chat logs for each channel
         self.__chatLogs = {}
         
@@ -15,7 +15,7 @@ class Server:
         self.__members = np.empty(15, dtype=object)
 
         # If load_from_files is True, load existing data
-        if load_from_files:
+        if loadFromFiles:
             self.loadServerState()
 
     def saveServerState(self):
@@ -30,7 +30,7 @@ class Server:
             with open('members.txt', 'w') as f:
                 for member in self.__members:
                     if member is not None and member != '':
-                        f.write(f"{member.name}\n")
+                        f.write(f"{member}\n")
 
             # Save Channels
             with open('channels.txt', 'w') as f:
@@ -99,7 +99,7 @@ class Server:
     def createChannel(self, member, channelName) -> bool:
         # Check if the member has the required permission
         if not member.hasPermission(Permission.CREATE_CHANNEL):
-            print(f"Error: {member.name} does not have permission to create a channel.")
+            print(f"Error: {member} does not have permission to create a channel.")
             return False
         
         # Check if the channel already exists
@@ -109,7 +109,7 @@ class Server:
         
         # Create the channel and initialize its member list
         self.__channels[channelName] = []
-        print(f"Channel '{channelName}' created successfully by {member.name}.")
+        print(f"Channel '{channelName}' created successfully by {member}.")
         
         # Save state after modification
         self.saveServerState()
@@ -135,7 +135,7 @@ class Server:
     def createChannel(self, member, channelName) -> bool:
         # Check if the member has the required permission
         if not member.hasPermission(Permission.CREATE_CHANNEL):
-            print(f"Error: {member.name} does not have permission to create a channel.")
+            print(f"Error: {member} does not have permission to create a channel.")
             return False
         
         # Check if the channel already exists
@@ -145,7 +145,7 @@ class Server:
         
         # Create the channel and initialize its member list
         self.__channels[channelName] = []
-        print(f"Channel '{channelName}' created successfully by {member.name}.")
+        print(f"Channel '{channelName}' created successfully by {member}.")
         return True
 
     # Method to allow a member to join an existing channel
@@ -157,7 +157,7 @@ class Server:
         
         # Add the member to the channel's member list
         self.__channels[channelName].append(member)
-        print(f"{member.name} joined the channel '{channelName}'.")
+        print(f"{member} joined the channel '{channelName}'.")
         return True
 
     # Method to add a new user to the server
@@ -171,7 +171,7 @@ class Server:
         for i in range(len(self.__members)):
             if self.__members[i] is None or self.__members[i] == '':
                 self.__members[i] = user
-                print(f"{user.name} added to the server.")
+                print(f"{user} added to the server.")
                 return True
         
         return False
@@ -180,7 +180,7 @@ class Server:
     def addUserToChannel(self, member, user, channelName) -> bool:
         # Check if the member has the required permission
         if not member.hasPermission(Permission.ADD_USER):
-            print(f"Error: {member.name} does not have permission to add users.")
+            print(f"Error: {member} does not have permission to add users.")
             return False
         
         # Check if the channel exists
@@ -195,19 +195,19 @@ class Server:
         if user not in self.__members:
             self.__members.append(user)
 
-        print(f"{user.name} added to '{channelName}' by {member.name}.")
+        print(f"{user} added to '{channelName}' by {member}.")
         return True
 
     # Method to post a message in a specific channel
     def postMessage(self, member, channelName, message) -> bool:
         # Check if the member has the required permission
         if not member.hasPermission(Permission.POST_MESSAGE):
-            print(f"Error: {member.name} does not have permission to post a message.")
+            print(f"Error: {member} does not have permission to post a message.")
             return False
         
         # Check if the channel exists and the member is part of the channel
         if channelName not in self.__channels or member not in self.__channels[channelName]:
-            print(f"Error: {member.name} is not part of the channel '{channelName}'.")
+            print(f"Error: {member} is not part of the channel '{channelName}'.")
             return False
         
         # Check if the message is not empty
@@ -219,14 +219,14 @@ class Server:
         if channelName not in self.__chatLogs:
             self.__chatLogs[channelName] = []
         self.__chatLogs[channelName].append(message)
-        print(f"Message from {member.name} posted successfully in '{channelName}'.")
+        print(f"Message from {member} posted successfully in '{channelName}'.")
         return True
 
     # Method to delete a specific channel
     def deleteChannel(self, member, channelName) -> bool:
         # Check if the member has the required permission
         if not member.hasPermission(Permission.DELETE_CHANNEL):
-            print(f"Error: {member.name} does not have permission to delete a channel.")
+            print(f"Error: {member} does not have permission to delete a channel.")
             return False
         
         # Check if the channel exists
@@ -236,14 +236,14 @@ class Server:
         
         # Delete the channel
         del self.__channels[channelName]
-        print(f"Channel '{channelName}' deleted successfully by {member.name}.")
+        print(f"Channel '{channelName}' deleted successfully by {member}.")
         return True
 
     # Method to delete a user from a specific channel
     def deleteUserFromChannel(self, member, userName, channelName) -> bool:
         # Check if member has the required permission
         if not member.hasPermission(Permission.REMOVE_USER):
-            print(f"Error: {member.name} does not have permission to delete a user.")
+            print(f"Error: {member} does not have permission to delete a user.")
             return False            
         
         # Check if the channel exists
@@ -258,14 +258,14 @@ class Server:
 
         # Delete User
         self.__channels[channelName].remove(userName)
-        print(f"Channel '{channelName}' deleted successfully by {member.name}.")
+        print(f"Channel '{channelName}' deleted successfully by {member}.")
         return True 
 
     # Method to delete a user from the server
     def deleteUserFromServer(self, member, userName):
         # Check if member has the required permission
         if not member.hasPermission(Permission.REMOVE_USER):
-            print(f"Error: {member.name} does not have permission to delete a user.")
+            print(f"Error: {member} does not have permission to delete a user.")
             return False
         
         # Check if user is a member
@@ -283,7 +283,7 @@ class Server:
     def deleteMessageFromServer(self, member, message, channelName):
         # Check if member has the required permission
         if not member.hasPermission(Permission.REMOVE_MESSAGE):
-            print(f"Error: {member.name} does not have permission to delete a message.")
+            print(f"Error: {member} does not have permission to delete a message.")
             return False
 
         # Check if the channel exists
