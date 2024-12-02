@@ -16,9 +16,9 @@ class Server:
 
         # If load_from_files is True, load existing data
         if load_from_files:
-            self.load_server_state()
+            self.loadServerState()
 
-    def save_server_state(self):
+    def saveServerState(self):
         """
         Save server state to text files:
         - members.txt: List of member names
@@ -51,7 +51,7 @@ class Server:
             print(f"Error saving server state: {e}")
             return False
 
-    def load_server_state(self):
+    def loadServerState(self):
         """
         Load server state from text files:
         - members.txt
@@ -112,7 +112,7 @@ class Server:
         print(f"Channel '{channelName}' created successfully by {member.name}.")
         
         # Save state after modification
-        self.save_server_state()
+        self.saveServerState()
         return True
 
     # Similar modifications for other methods that change server state
@@ -120,7 +120,7 @@ class Server:
         # Existing implementation
         result = self._add_user_logic(user)
         if result:
-            self.save_server_state()
+            self.saveServerState()
         return result
 
     def postMessage(self, member, channelName, message) -> bool:
@@ -128,7 +128,7 @@ class Server:
         # Check permissions, channel existence, etc.
         result = self.postMessage(member, channelName, message)
         if result:
-            self.save_server_state()
+            self.saveServerState()
         return result
 
     # Method to create a new channel
