@@ -121,6 +121,49 @@ class Server:
         print(f"Channel '{channelName}' deleted successfully by {member.name}.")
         return True
 
+    # Method to delete a user from a specific channel
+    def deleteUserFromChannel(self, member, userName, channelName) -> bool:
+        # Check if member has the required permission
+        if not member.hasPermission(Permission.REMOVE_USER):
+            print(f"Error: {member.name} does not have permission to delete a user.")
+            return False            
+        
+        # Check if the channel exists
+        if channelName not in self.__channels:
+            print(f"Error: Channel '{channelName}' does not exist.")
+            return False
+            
+        # Check if the user exists
+        if userName not in self.__channels[channelName]:
+            print(f"Error: {userName} not in {channelName}")
+            return False
+
+        # Delete User
+        self.__channels[channelName].remove(userName)
+        print(f"Channel '{channelName}' deleted successfully by {member.name}.")
+        return True 
+
+    # Method to delete a user from the server
+    def deleteUserFromServer(self, member, userName):
+        # Check if member has the required permission
+        if not member.hasPermission(Permission.REMOVE_USER):
+            print(f"Error: {member.name} does not have permission to delete a user.")
+            return False
+        
+        # Check if user is a member
+        if userName not in self.__members:
+            print(f"Error: {userName} does not exist.")
+            return False
+
+        self.__members = self.__members.delete(userName)
+
+        for channelName in self.__channels:
+            if userName in self.__channels[channelName]:
+                self.deleteUserFromChannel(Admin(None), userName, channelName) 
+
+ 
+
+
     # Method to display all members in the server
     def displayMembers(self) -> bool:
         # Check if the member list is empty

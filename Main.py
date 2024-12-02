@@ -44,34 +44,6 @@ def main():
             if choice == 1:
                 channelName = joinChannel(server, member)
 
-
-                
-                while channelName is not None:
-                    displayChannelMenu()
-                    channelChoice = 0
-
-                    # Validate Input
-                    while not valid:
-                        try:
-                            choice = int(input("\nEnter here: "))
-                            
-                            if choice in [1, 2, 3]:
-                                valid = True
-                            else:
-                                displayChannelMenu()
-                        except ValueError:
-                            displayChannelMenu()
-                    
-                    if choice == 1:
-                        message = input("Input Message: ")
-
-                        server.postMessage(member, channelName, message)
-                    else:
-                        server.displayChannelMembers()
-
-                            
-
-
             elif choice == 2:
                 # Show current interactions
                     server.displayChatLog(channelName)
@@ -82,8 +54,7 @@ def main():
 
             elif choice == 4:
                 if member.hasPermission("create_channel"):
-                    displayAdminMenu()
-
+                    launchAdminMenu()
                 else:
                     print("Only Admins can perform this action.")
             elif choice == 5:
@@ -101,16 +72,62 @@ def displayMenu() -> None:
 4. Admin Actions (if applicable): Administrators can add or remove users, and delete inappropriate messages.
 5. Exit System: Ends the session.""")
 
-def displayChannelMenu():
+def displayChannelMenu() -> None:
     print("""\n1. Post a Message
 2. List All Users in Current Channel
 3. Go Back""")
 
-def displayAdminMenu():
+def launchAdminMenu(member: Member, server: Server, channelName: str) -> None:
     print("""Admin Console: 
 1. Add User 
 2. Remove User 
-3. Delete Message.""")
+3. Delete Message.
+4. Go Back""")
+    
+    while not valid:
+        try: 
+            choice = int(input("\nEnter your choice: "))
+
+            if choice in [1,2,3]:
+                valid = True
+
+        except ValueError:
+            print("\nInvalid Choice!")
+
+    if choice == 1:
+        userName = input("\nInput name of user: ")
+
+        server.addUserToChannel(member, User(userName), channelName)
+    elif choice == 2:
+        print("\nWould you like to remove from (1)Channel or (2)Server")
+        while not valid:
+            try: 
+                remChoice = int(input("\nEnter your choice: "))
+
+                if remChoice in [1,2]:
+                    valid = True
+
+            except ValueError:
+                print("\nInvalid Choice!")
+        
+        userName = input("\nInput name of user: ")        
+        if remChoice == 1:
+            if channelName is not None:
+                server.deleteUserFromChannel(member, userName, channelName)
+            else:
+                print("\nNot in a channel!")
+        else:
+            server.deleteUserFromServer(member, userName)
+    elif choice == 3:
+        if channelName is not None:
+            server.displayChatLog(channelName)
+
+            message = input("Enter brief content of message you'd like to remove: ")
+
+            
+
+
+            
 
 
     
