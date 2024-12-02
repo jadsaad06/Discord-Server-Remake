@@ -72,6 +72,11 @@ class Server:
         
         # Add the user to the channel's member list
         self.__channels[channelName].append(user)
+
+        # Add the user to the server's member list
+        if user not in self.__members:
+            self.__members.append(user)
+
         print(f"{user.name} added to '{channelName}' by {member.name}.")
         return True
 
