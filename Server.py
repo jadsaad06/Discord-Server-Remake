@@ -141,3 +141,18 @@ class Server:
             print(x)
         return True
 
+    def displayChatLog(self, channelName):
+        if channelName is None:
+            print("\nError! Not in a channel!")
+        elif not self.__chatLogs[channelName]:
+            print("\nNothing here yet!")
+        else:
+            for x in self.__chatLogs[channelName]:
+                print(x)
+    
+    def displayChannelMembers(self, channelName):
+        if channelName not in self.__channels:
+            print("\nChannel doesn't exist!")
+        else:
+            for x in self.__channels[channelName]:
+                print(x)
