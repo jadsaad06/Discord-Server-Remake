@@ -4,73 +4,144 @@ import numpy as np
 # ServerSystem class for managing channels and members
 class Server:
     def __init__(self):
-        self.__chatLogs = {} #Dictionary to store channels and corresponding chat logs
-        self.__channels = {}  # Dictionary to store channels and their members
-        self.__members = np.empty(10, dtype=str) #array of all members in server
+        # Dictionary to store chat logs for each channel
+        self.__chatLogs = {}
+        
+        # Dictionary to store channels and their members
+        self.__channels = {}
+        
+        # Array to store all members in the server, initially empty
+        self.__members = np.empty(10, dtype=str)
 
-    def createChannel(self, member, channelName):
+    # Method to create a new channel
+    def createChannel(self, member, channelName) -> bool:
+        # Check if the member has the required permission
         if not member.hasPermission(Permission.CREATE_CHANNEL):
-            return f"Error: {member.name} does not have permission to create a channel."
-        if channelName in self.channels:
-            return f"Error: Channel '{channelName}' already exists."
+            print(f"Error: {member.name} does not have permission to create a channel.")
+            return False
         
-        self.channels[channelName] = []
-        return f"Channel '{channelName}' created successfully by {member.name}."
-    
-    def joinChannel(self, member, channelName):
-        if channelName not in self.channels:
-            return f"Error: Channel '{channelName}' does not exist"
+        # Check if the channel already exists
+        if channelName in self.__channels:
+            print(f"Error: Channel '{channelName}' already exists.")
+            return False
         
-        self.channels[channelName].append(member)
+        # Create the channel and initialize its member list
+        self.__channels[channelName] = []
+        print(f"Channel '{channelName}' created successfully by {member.name}.")
+        return True
 
-    def addUserToServer(self, user, channelName):
-        self.__members.append(user)
+    # Method to allow a member to join an existing channel
+    def joinChannel(self, member, channelName) -> bool:
+        # Check if the channel exists
+        if channelName not in self.__channels:
+            print(f"Error: Channel '{channelName}' does not exist.")
+            return False
         
-    def addUserToChannel(self, member, user, channelName):
+        # Add the member to the channel's member list
+        self.__channels[channelName].append(member)
+        print(f"{member.name} joined the channel '{channelName}'.")
+        return True
+
+    # Method to add a new user to the server
+    def addUserToServer(self, user) -> bool:
+        # Check if the server's member array is full
+        if self.__members.size >= 10 and all(self.__members):
+            print("Error: Server member limit reached.")
+            return False
+        
+        # Find an empty slot in the array and add the user
+        for i in range(len(self.__members)):
+            if self.__members[i] is None or self.__members[i] == '':
+                self.__members[i] = user
+                print(f"{user.name} added to the server.")
+                return True
+        
+        return False
+
+    # Method to add a user to a specific channel
+    def addUserToChannel(self, member, user, channelName) -> bool:
+        # Check if the member has the required permission
         if not member.hasPermission(Permission.ADD_USER):
-            return f"Error: {member.name} does not have permission to add users."
+            print(f"Error: {member.name} does not have permission to add users.")
+            return False
         
-        if channelName not in self.channels:
-            return f"Error: Channel '{channelName}' does not exist."
+        # Check if the channel exists
+        if channelName not in self.__channels:
+            print(f"Error: Channel '{channelName}' does not exist.")
+            return False
         
-        self.channels[channelName].append(user)
-        return f"{user.name} added to '{channelName}' by {member.name}."
+        # Add the user to the channel's member list
+        self.__channels[channelName].append(user)
+        print(f"{user.name} added to '{channelName}' by {member.name}.")
+        return True
 
-    def postMessage(self, member, channelName, message):
+    # Method to post a message in a specific channel
+    def postMessage(self, member, channelName, message) -> bool:
+        # Check if the member has the required permission
         if not member.hasPermission(Permission.POST_MESSAGE):
-            return f"Error: {member.name} does not have permission to post a message."
+            print(f"Error: {member.name} does not have permission to post a message.")
+            return False
         
-        if channelName not in self.channels or member not in self.channels[channelName]:
-            return f"Error: {member.name} is not part of the channel '{channelName}'."
+        # Check if the channel exists and the member is part of the channel
+        if channelName not in self.__channels or member not in self.__channels[channelName]:
+            print(f"Error: {member.name} is not part of the channel '{channelName}'.")
+            return False
         
+        # Check if the message is not empty
         if not message.strip():
-            return "Error: Message cannot be empty."
+            print("Error: Message cannot be empty.")
+            return False
         
+        # Add the message to the channel's chat logs
+        if channelName not in self.__chatLogs:
+            self.__chatLogs[channelName] = []
         self.__chatLogs[channelName].append(message)
+        print(f"Message from {member.name} posted successfully in '{channelName}'.")
+        return True
 
-        return f"Message from {member.name} posted successfully in '{channelName}'."
-
-    def deleteChannel(self, member, channelName):
+    # Method to delete a specific channel
+    def deleteChannel(self, member, channelName) -> bool:
+        # Check if the member has the required permission
         if not member.hasPermission(Permission.DELETE_CHANNEL):
-            return f"Error: {member.name} does not have permission to delete a channel."
-        if channelName not in self.channels:
-            return f"Error: Channel '{channelName}' does not exist."
+            print(f"Error: {member.name} does not have permission to delete a channel.")
+            return False
         
-        del self.channels[channelName]
+        # Check if the channel exists
+        if channelName not in self.__channels:
+            print(f"Error: Channel '{channelName}' does not exist.")
+            return False
+        
+        # Delete the channel
+        del self.__channels[channelName]
+        print(f"Channel '{channelName}' deleted successfully by {member.name}.")
+        return True
 
-        return f"Channel '{channelName}' deleted successfully by {member.name}."
-    
-    def displayMembers(self):
+    # Method to display all members in the server
+    def displayMembers(self) -> bool:
+        # Check if the member list is empty
         if self.__members.size == 0:
-            return f"Error! No Members Added!"
+            print("Error! No Members Added!")
+            return False
         
+        # Print each member
         for x in self.__members:
-            print(x)
-    
-    def displayChannels(self):
+            if x:
+                print(x)
+        return True
+
+    # Method to display all existing channels
+    def displayChannels(self) -> bool:
+        # Check if there are no channels
         if not self.__channels:
-            return f"Error! No Channels Found!"
-           
+            print("Error! No Channels Found!")
+            return False
+        
+        # Print each channel name
         for x in self.__channels:
             print(x)
-    
+        return True
+
+    # Method to check if the server has no channels
+    def isEmpty(self) -> bool:
+        # Return True if no channels exist, otherwise False
+        return not bool(self.__channels)
