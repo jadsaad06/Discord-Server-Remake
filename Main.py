@@ -163,8 +163,8 @@ def launchAdminMenu(member, server: Server, channelName: str) -> None:
             # Ask for the message content to delete
             message = input("Enter the brief content of message you'd like to remove: ")
 
-            # Delete the message from the server
-            server.deleteMessageFromServer(member, message, channelName)
+            # Delete the message from the channel
+            server.deleteMessageFromChannel(member, message, channelName)
         else:
             print("\nNot in a channel!")  # Handle case when not in a channel
     

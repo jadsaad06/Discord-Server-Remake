@@ -140,10 +140,10 @@ class Server:
             print(f"{user} added to the server.")
         else:
             print(f"Welcome Back {user}!")
-        self.saveServerState()
+            self.saveServerState()
+        
         return True
         
-        return False
 
     # Method to add a user to a specific channel
     def addUserToChannel(self, member, user, channelName) -> bool:
@@ -212,27 +212,28 @@ class Server:
         self.saveServerState()
         return True
 
-    # Method to delete a user from a specific channel
     def deleteUserFromChannel(self, member, userName, channelName) -> bool:
         # Check if member has the required permission
         if not member.hasPermission(Permission.REMOVE_USER):
             print(f"Error: {member} does not have permission to delete a user.")
             return False            
-        
+
         # Check if the channel exists
         if channelName not in self.__channels:
             print(f"Error: Channel '{channelName}' does not exist.")
             return False
-            
-        # Check if the user exists
-        if userName not in self.__channels[channelName]:
+                
+        # Check if the user exists in the channel
+        user_to_remove = next((user for user in self.__channels[channelName] if user._name == userName), None)
+        if not user_to_remove:
             print(f"Error: {userName} not in {channelName}")
             return False
 
         # Delete User
-        self.__channels[channelName].remove(userName)
-        print(f"Channel '{channelName}' deleted successfully by {member}.")
-        return True 
+        self.__channels[channelName].remove(user_to_remove)
+        print(f"{userName} removed from channel '{channelName}' by {member}.")
+        return True
+
 
     # Method to delete a user from the server
     def deleteUserFromServer(self, member, userName):
@@ -255,7 +256,7 @@ class Server:
         self.saveServerState()
 
     # Method to delete a message from a channel
-    def deleteMessageFromServer(self, member, message, channelName):
+    def deleteMessageFromChannel(self, member, message, channelName):
         # Check if member has the required permission
         if not member.hasPermission(Permission.REMOVE_MESSAGE):
             print(f"Error: {member} does not have permission to delete a message.")
@@ -278,9 +279,6 @@ class Server:
         return False
     
     
-
-
-
     # Method to display all members in the server
     def displayMembers(self) -> bool:
         # Check if the member list is empty

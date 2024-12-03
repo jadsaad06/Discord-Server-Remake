@@ -37,6 +37,7 @@ class Admin(Member):
             Permission.REMOVE_USER,
             Permission.POST_MESSAGE,
             Permission.VIEW_FEED,
+            Permission.REMOVE_MESSAGE,
         ]
     
 
