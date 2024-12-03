@@ -1,0 +1,5 @@
+Channel: General
+Jad: Hey Guys
+Mustafa: Hey Jad
+Nom: Hello
+---END_OF_CHANNEL---

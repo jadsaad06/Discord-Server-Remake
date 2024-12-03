@@ -1,3 +1,6 @@
+#Name: Jad Saad
+#File: Member.py
+
 from enum import Enum
 
 # Enum for defining permissions
@@ -15,18 +18,19 @@ class Permission(Enum):
 class Member:
     def __init__(self, name: str):
         self._name = name
-        self.__permissions = []
+        self._permissions = []
 
     def hasPermission(self, permission):
-        return permission in self.__permissions
+        return permission in self._permissions
     
     def __str__(self):
         return self._name
+    
 # Derived class: Admin
 class Admin(Member):
     def __init__(self, name: str):
         super().__init__(name)
-        self.__permissions = [
+        self._permissions = [
             Permission.CREATE_CHANNEL,
             Permission.DELETE_CHANNEL,
             Permission.ADD_USER,
@@ -40,16 +44,18 @@ class Admin(Member):
 class User(Member):
     def __init__(self, name: str):
         super().__init__(name)
-        self.__permissions = [
+        self._permissions = [
             Permission.POST_MESSAGE,
             Permission.VIEW_FEED,
         ]
 
-# Derived class: Bot
-class Bot(Member):
+# Derived class: Moderator
+class Mod(Member):
     def __init__(self, name: str):
         super().__init__(name)
-        self.__permissions = [Permission.REMOVE_MESSAGE,
-                              Permission.VIEW_FEED,
-                              ]
+        self._permissions = [
+            Permission.REMOVE_MESSAGE,
+            Permission.VIEW_FEED,
+            Permission.POST_MESSAGE,
+        ]
 

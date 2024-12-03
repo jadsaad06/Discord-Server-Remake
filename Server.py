@@ -1,10 +1,13 @@
-from Member import Admin, User, Bot, Permission
+#Name: Jad Saad
+#File: Server.py
+
+from Member import Admin, User, Mod, Permission
 import numpy as np
 import os
 
 # ServerSystem class for managing channels and members
 class Server:
-    def __init__(self, loadFromFiles=False):
+    def __init__(self):
         # Dictionary to store chat logs for each channel
         self.__chatLogs = {}
         
@@ -14,17 +17,14 @@ class Server:
         # Array to store all members in the server
         self.__members = np.empty(15, dtype=object)
 
-        # If load_from_files is True, load existing data
-        if loadFromFiles:
-            self.loadServerState()
+        # np array current size
+        self.__memberCount = 0
 
+        # Load From Files
+        self.loadServerState()
+
+    # Save the data to the channels, chatLogs, and member text files
     def saveServerState(self):
-        """
-        Save server state to text files:
-        - members.txt: List of member names
-        - channels.txt: List of channel names
-        - chatLogs.txt: Chat logs for each channel
-        """
         try:
             # Save Members
             with open('members.txt', 'w') as f:
@@ -39,11 +39,14 @@ class Server:
 
             # Save Chat Logs
             with open('chatLogs.txt', 'w') as f:
+                valid_channels = set(self.__channels.keys())
                 for channel, logs in self.__chatLogs.items():
-                    f.write(f"Channel: {channel}\n")
-                    for log in logs:
-                        f.write(f"{log}\n")
-                    f.write("---END_OF_CHANNEL---\n")
+                    # Check if the channel is valid
+                    if channel in valid_channels:
+                        f.write(f"Channel: {channel}\n")
+                        for log in logs:
+                            f.write(f"{log}\n")
+                        f.write("---END_OF_CHANNEL---\n")
 
             print("Server state saved successfully.")
             return True
@@ -51,23 +54,19 @@ class Server:
             print(f"Error saving server state: {e}")
             return False
 
+    # Load the data from each of the three text files
     def loadServerState(self):
-        """
-        Load server state from text files:
-        - members.txt
-        - channels.txt
-        - chatLogs.txt
-        """
+
         try:
             # Load Members
             if os.path.exists('members.txt'):
                 with open('members.txt', 'r') as f:
                     members = [line.strip() for line in f.readlines()]
-                    # Here you'd typically recreate User objects based on names
-                    # For this example, we'll just store names
-                    for i, member_name in enumerate(members):
-                        if i < 15:  # Respect array size limit
-                            self.__members[i] = member_name
+
+                    for i, memberName in enumerate(members):
+                        if i < 15:  
+                            self.__members[i] = User(memberName)
+                            self.__memberCount += 1
 
             # Load Channels
             if os.path.exists('channels.txt'):
@@ -115,39 +114,6 @@ class Server:
         self.saveServerState()
         return True
 
-    # Similar modifications for other methods that change server state
-    def addUserToServer(self, user) -> bool:
-        # Existing implementation
-        result = self._add_user_logic(user)
-        if result:
-            self.saveServerState()
-        return result
-
-    def postMessage(self, member, channelName, message) -> bool:
-        # Existing implementation from original code
-        # Check permissions, channel existence, etc.
-        result = self.postMessage(member, channelName, message)
-        if result:
-            self.saveServerState()
-        return result
-
-    # Method to create a new channel
-    def createChannel(self, member, channelName) -> bool:
-        # Check if the member has the required permission
-        if not member.hasPermission(Permission.CREATE_CHANNEL):
-            print(f"Error: {member} does not have permission to create a channel.")
-            return False
-        
-        # Check if the channel already exists
-        if channelName in self.__channels:
-            print(f"Error: Channel '{channelName}' already exists.")
-            return False
-        
-        # Create the channel and initialize its member list
-        self.__channels[channelName] = []
-        print(f"Channel '{channelName}' created successfully by {member}.")
-        return True
-
     # Method to allow a member to join an existing channel
     def joinChannel(self, member, channelName) -> bool:
         # Check if the channel exists
@@ -163,16 +129,19 @@ class Server:
     # Method to add a new user to the server
     def addUserToServer(self, user) -> bool:
         # Check if the server's member array is full
-        if self.__members.size >= 15 and all(self.__members):
+        if self.__memberCount >= 15:
             print("Error: Server member limit reached.")
             return False
         
         # Find an empty slot in the array and add the user
-        for i in range(len(self.__members)):
-            if self.__members[i] is None or self.__members[i] == '':
-                self.__members[i] = user
-                print(f"{user} added to the server.")
-                return True
+        if user not in self.__members:
+            self.__members[self.__memberCount] = user
+            self.__memberCount += 1
+            print(f"{user} added to the server.")
+        else:
+            print(f"Welcome Back {user}!")
+        self.saveServerState()
+        return True
         
         return False
 
@@ -193,9 +162,11 @@ class Server:
 
         # Add the user to the server's member list
         if user not in self.__members:
-            self.__members.append(user)
+            self.__members[self.__memberCount] = user
+            self.__memberCount += 1
 
         print(f"{user} added to '{channelName}' by {member}.")
+        self.saveServerState()
         return True
 
     # Method to post a message in a specific channel
@@ -207,7 +178,7 @@ class Server:
         
         # Check if the channel exists and the member is part of the channel
         if channelName not in self.__channels or member not in self.__channels[channelName]:
-            print(f"Error: {member} is not part of the channel '{channelName}'.")
+            print(f"Error: {member} is not part of a channel")
             return False
         
         # Check if the message is not empty
@@ -218,8 +189,9 @@ class Server:
         # Add the message to the channel's chat logs
         if channelName not in self.__chatLogs:
             self.__chatLogs[channelName] = []
-        self.__chatLogs[channelName].append(message)
+        self.__chatLogs[channelName].append(f"{member}: {message}")
         print(f"Message from {member} posted successfully in '{channelName}'.")
+        self.saveServerState()
         return True
 
     # Method to delete a specific channel
@@ -237,6 +209,7 @@ class Server:
         # Delete the channel
         del self.__channels[channelName]
         print(f"Channel '{channelName}' deleted successfully by {member}.")
+        self.saveServerState()
         return True
 
     # Method to delete a user from a specific channel
@@ -278,6 +251,8 @@ class Server:
         for channelName in self.__channels:
             if userName in self.__channels[channelName]:
                 self.deleteUserFromChannel(Admin(None), userName, channelName) 
+        
+        self.saveServerState()
 
     # Method to delete a message from a channel
     def deleteMessageFromServer(self, member, message, channelName):
@@ -292,15 +267,17 @@ class Server:
             return False
         
         # Look for message using substring
-        for i in range(self.__chatLogs[channelName]):
-            if message in self.__chatLogs[channelName][i]:
-                del self.__chatLogs[channelName][i]
-                print("\nMessage successfully deleted!")
+        for currMessage in self.__chatLogs[channelName]:
+            if message in currMessage:
+                self.__chatLogs[channelName].remove(currMessage)
+                print("\nMessage Removed")
                 return True
         
         # Returns False if message is not found
         print("\nMessage not found")
         return False
+    
+    
 
 
 
@@ -329,6 +306,7 @@ class Server:
             print(x)
         return True
 
+    # Method to display chat log in current channel
     def displayChatLog(self, channelName):
         if channelName is None:
             print("\nError! Not in a channel!")
@@ -338,6 +316,7 @@ class Server:
             for x in self.__chatLogs[channelName]:
                 print(x)
     
+    # Method to disploay all members in current channel
     def displayChannelMembers(self, channelName):
         if channelName not in self.__channels:
             print("\nChannel doesn't exist!")

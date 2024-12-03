@@ -1,22 +1,23 @@
-# Check if save files exist
-import os
+#Name: Jad Saad
+#Program: 4
+#Class: CS302
+#File: Main.py
+"""Descripton: This program is inspired by Discord, bringing a community of gamers together through discussion channels!
+In this program you are able to join as either a User, Moderator, or Admin. With each type of member, you get different permissions.
+Using the os import, I was able to create, modify, and read files to save the channels, chat logs, and members! Using Glass Box testing,
+I was able to make sure that all my code was working as I wrote it, and outputted working, well written code, efficiently"""
+
 
 from Server import Server
-from Member import Member, User, Admin
+from Member import User, Admin, Mod
 
 def main():
     
-    # Only load from files if the save files are present
-    filesExist = (
-        os.path.exists('members.txt') and 
-        os.path.exists('channels.txt') and 
-        os.path.exists('chatLogs.txt')
-    )
-    
-    # Create server, loading previous state if files exist
-    server = Server(filesExist)
+    # Create server, loading previous state 
+    server = Server()
+
     print("\nHello! Welcome to the Viking Gaming Hub!")
-    print("\nWould you like to be a (1)User or (2)Admin? Enter 3 to exit.")
+    print("\nWould you like to be a (1)User, (2)Admin or (3) Moderator? Enter 4 to exit.")
     
     valid = False
     
@@ -24,27 +25,27 @@ def main():
         try:
             choice = int(input("\nEnter here: "))
             
-            if choice in [1, 2, 3]:
+            if choice in [1, 2, 3, 4]:
                 valid = True
             else:
-                print("\nMust choose (1)User, (2)Admin, or (3) to Exit.")
+                print("\nWould you like to be a (1)User, (2)Admin or (3) Moderator? Enter 4 to exit.")
         except ValueError:
-            print("\nMust choose (1)User, (2)Admin, or (3) to Exit.")
+            print("\nMust Choose(1)User, (2)Admin or (3)Moderator? Enter 4 to exit.")
     
-    if choice == 3:
+    if choice == 4:
         print("Goodbye!")
         return
     
-    # Create server if not exiting
-    server = Server()
 
     name = input("Enter your username: ")
 
     # Create Player
     if choice == 1:
         member = User(name)
-    else:
+    elif choice == 2:
         member = Admin(name)
+    else:
+        member = Mod(name)
     
     server.addUserToServer(member)
 
@@ -60,7 +61,6 @@ def main():
                 channelName = joinChannel(server, member)
 
             elif choice == 2:
-                # Show current interactions
                     server.displayChatLog(channelName)
 
             elif choice == 3:
@@ -68,7 +68,7 @@ def main():
                     server.postMessage(member, channelName, message)
 
             elif choice == 4:
-                if member.hasPermission("create_channel"):
+                if not isinstance(member, User):
                     launchAdminMenu(member, server, channelName)
                 else:
                     print("Only Admins can perform this action.")
@@ -84,13 +84,9 @@ def displayMenu() -> None:
     print("""\n1. Join a Channel: Users can select a channel to join.
 2. View Messages: Users can see the most recent messages posted in the channel.
 3. Send a Message: Users can post a message or send a private message. (private messaging will be added in prog5)
-4. Admin Actions (if applicable): Administrators can add or remove users, and delete inappropriate messages.
+4. Admin/Moderator Actions (if applicable): Administrators can add or remove users and channels, and delete inappropriate messages. Moderators can only remove messages.
 5. Exit System: Ends the session.""")
 
-def displayChannelMenu() -> None:
-    print("""\n1. Post a Message
-2. List All Users in Current Channel
-3. Go Back""")
 
 def launchAdminMenu(member, server: Server, channelName: str) -> None:
     # Display the admin menu with options
@@ -98,7 +94,9 @@ def launchAdminMenu(member, server: Server, channelName: str) -> None:
 1. Add User 
 2. Remove User 
 3. Delete Message.
-4. Go Back""")
+4. Create Channel
+5. Remove Channel
+6. Go Back""")
     
     valid = False  # Flag to track valid input
 
@@ -108,8 +106,8 @@ def launchAdminMenu(member, server: Server, channelName: str) -> None:
             # Prompt user for input and convert to an integer
             choice = int(input("\nEnter your choice: "))
 
-            # Check if the choice is valid (1, 2, or 3 for actions)
-            if choice in [1, 2, 3]:
+            # Check if the choice is valid
+            if choice in [1, 2, 3, 4, 5, 6]:
                 valid = True
 
         except ValueError:
@@ -169,6 +167,17 @@ def launchAdminMenu(member, server: Server, channelName: str) -> None:
             server.deleteMessageFromServer(member, message, channelName)
         else:
             print("\nNot in a channel!")  # Handle case when not in a channel
+    
+    elif choice == 4:
+        # Get the name of the channel wanting to be created
+        toCreate = input("Input the name of the channel you'd like to create: ")
+        
+        server.createChannel(member, toCreate)
+    elif choice == 5:
+        # Get the name of the channel wanting to be deleted
+        toDelete = input("Input the name of the channel you'd like to delete: ")
+        
+        server.deleteChannel(member, toDelete)
 
     
 def joinChannel(server: Server, member) -> str:

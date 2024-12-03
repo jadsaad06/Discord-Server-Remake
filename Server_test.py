@@ -1,6 +1,9 @@
+#Name: Jad Saad
+#File: Server_test.py
+
 import pytest
 from Server import Server
-from Member import Admin, User, Bot, Permission
+from Member import Admin, User, Mod, Permission
 
 # Test for admin creating a channel
 def test_adminCreateChannel():
@@ -51,8 +54,10 @@ def test_postWithoutJoining():
     result = server.postMessage(user, "general", "Hello!")
     assert result is False
 
-# Test for bot scanning for prohibited content
-def test_botPermissions():
-    bot = Bot("ScanBot")
-    assert bot.hasPermission(Permission.SCAN_CONTENT) is True
-    assert bot.hasPermission(Permission.POST_MESSAGE) is False
+# Test for Mod scanning for prohibited content
+def test_ModPermissions():
+    mod = Mod("Moderator")
+    assert mod.hasPermission(Permission.REMOVE_MESSAGE) is True
+    assert mod.hasPermission(Permission.VIEW_FEED) is True
+    assert mod.hasPermission(Permission.POST_MESSAGE) is True
+    assert mod.hasPermission(Permission.CREATE_CHANNEL) is False

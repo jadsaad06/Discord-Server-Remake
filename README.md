@@ -6,3 +6,5 @@ The most optimal way to do this all would be to hold all data in a database, but
 You can either generate a user as an admin to fill up the channel/server, or you can end the program and create a user, then join the desired channel. 
 
 Now you can interact with users on the server! I have included the text files in the submission, but if you'd like to test, remove the files and generate new ones using the program!
+
+If using pytest, clear all text files for the tests to pass.
