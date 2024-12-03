@@ -192,7 +192,7 @@ def joinChannel(server: Server, member) -> str:
         if success:
             return channelName
     
-    #return None when no channels are available
+    # Return None when no channels are available
     return None
     
 
