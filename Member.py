@@ -26,6 +26,9 @@ class Member:
     def __str__(self):
         return self._name
     
+    def __eq__(self, name: str):
+        return self._name == name
+    
 # Derived class: Admin
 class Admin(Member):
     def __init__(self, name: str):

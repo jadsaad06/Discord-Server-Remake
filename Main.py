@@ -52,7 +52,7 @@ def main():
     choice = 0
     channelName = None
 
-    while choice != 5:
+    while choice != 6:
         displayMenu()
         try:
             choice = int(input("\nEnter your choice: "))
@@ -73,8 +73,11 @@ def main():
                 else:
                     print("Only Admins can perform this action.")
             elif choice == 5:
+                print("Server Members:\n")
+                server.displayMembers()
+            elif choice == 6:
                 print("Exiting system...")
-            else:
+            
                 print("Invalid option. Please try again.")
 
         except ValueError:
@@ -84,8 +87,9 @@ def displayMenu() -> None:
     print("""\n1. Join a Channel: Users can select a channel to join.
 2. View Messages: Users can see the most recent messages posted in the channel.
 3. Send a Message: Users can post a message or send a private message. (private messaging will be added in prog5)
-4. Admin/Moderator Actions (if applicable): Administrators can add or remove users and channels, and delete inappropriate messages. Moderators can only remove messages.
-5. Exit System: Ends the session.""")
+4. Admin/Moderator Actions (if applicable): Administrators can add or remove users and channels, and delete inappropriate messages. Moderators can only remove messages.\
+5. Display Member List
+6. Exit System: Ends the session.""")
 
 
 def launchAdminMenu(member, server: Server, channelName: str) -> None:

@@ -134,17 +134,18 @@ class Server:
             return False
         
         # Find an empty slot in the array and add the user
-        if user not in self.__members:
-            self.__members[self.__memberCount] = user
-            self.__memberCount += 1
-            print(f"{user} added to the server.")
-        else:
-            print(f"Welcome Back {user}!")
-            self.saveServerState()
+        for userName in self.__members:
+            if user == userName:
+                print(f"Welcome Back {user}!")
+                return True
+        
+        self.__members[self.__memberCount] = user
+        self.__memberCount += 1
+        print(f"{user} added to the server.")
+        self.saveServerState()
         
         return True
-        
-
+    
     # Method to add a user to a specific channel
     def addUserToChannel(self, member, user, channelName) -> bool:
         # Check if the member has the required permission
